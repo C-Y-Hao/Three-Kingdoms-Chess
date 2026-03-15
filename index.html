@@ -851,7 +851,7 @@
             
             console.log(gameData);
             
-            fetch('http://127.0.0.1:5001/start_game', {
+            fetch('https://lichenological-crissy-varicellate.ngrok-free.dev/start_game', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1025,7 +1025,7 @@
         }
         
         function sendAction(direction) {
-            fetch('http://127.0.0.1:5001/move_hero', {
+            fetch('https://lichenological-crissy-varicellate.ngrok-free.dev/move_hero', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
