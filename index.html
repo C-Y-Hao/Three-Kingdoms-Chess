@@ -8,7 +8,6 @@
         #auth-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            /*background: #2d1e14 center/cover; /* 可替換背景圖 */
             background-color: #1a1a1a;
             display: flex; justify-content: center; align-items: center;
             z-index: 999;
@@ -64,8 +63,6 @@
         .menu-card {
             width: 100vw;
             height: 100vh;
-                
-            /* 2. 移除圓角與邊距，確保貼齊邊緣 */
             border-radius: 0;
             margin: 0;
             border: none;
@@ -87,7 +84,7 @@
 
         .menu-grid {
             display: flex;
-            flex-direction: column; /* 垂直排列，也可以改為 row */
+            flex-direction: column;
             gap: 15px;
             width: 250px;
             align-items: center;
@@ -118,9 +115,7 @@
             border-color: #d4af37;
         }
 
-        /* 特別強調開始按鈕 */
         .menu-btn.primary { background: #3d99c5; border-color: #05288b; }
-        /* 特別強調登出按鈕 */
         .menu-btn.danger { background: #8b0000; border-color: #ff0000; margin-top: 10px; }
 
         .icon { margin-right: 10px; font-size: 1.2em; }
@@ -145,7 +140,7 @@
         }
         
         .recruit-card {
-            background: #2d1e14; /* 深木色 */
+            background: #2d1e14;
             padding: 30px;
             border: 3px solid #d4af37;
             text-align: center;
@@ -165,22 +160,21 @@
         }
         
         h1 {
-            /* 移除 position: absolute; top: 0; left: 20px; */
-            display: inline-block;    /* 讓背景只包住文字寬度 */
-            margin: 10px 0 0 20px;    /* 上外邊距10px，左外邊距20px */
+            display: inline-block;
+            margin: 10px 0 0 20px;
             background: #8b4513;
             color: #fdfaf2;
             padding: 10px 20px;
-            border-radius: 10px;      /* 四角圓角比較大器 */
+            border-radius: 10px;
             box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
             font-size: 16px;
         }
         
         .main-container {
-            display: flex;          /* 核心：讓子元素橫向排列 */
-            justify-content: center; /* 居中對齊 */
-            align-items: flex-start; /* 頂部對齊 */
-            gap: 15px;              /* 元件之間的間距 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 15px;
             padding: 20px;
             width: 100%;
             box-sizing: border-box;
@@ -189,26 +183,24 @@
         #game-area {
             display: flex;
             flex-direction: column;
-            align-items: center; /* 讓回合數在地圖正上方置中 */
+            align-items: center;
             gap: 0px;
         }
 
         #round-display {
-            /* 與地圖寬度同步 (80vmin 且不超過 650px) */
-            width: calc(80vmin + 10px); /* 10px 是地圖左右邊框 5px+5px 的總和 */
-            max-width: 810px;          /* 650px + 10px 邊框 */
+            width: calc(80vmin + 10px);
+            max-width: 810px;
             
-            background: #444;           /* 使用與地圖邊框 (#444) 一樣的顏色實現無縫 */
-            color: #ffd700;             /* 金色文字 */
+            background: #444;
+            color: #ffd700;
             text-align: center;
             padding: 8px 0;
             font-weight: bold;
             font-size: 1.2em;
             
-            /* 圓角處理：上方圓角，下方直角 */
             border-radius: 10px 10px 0 0;
-            border: 5px solid #444;     /* 與地圖邊框同色 */
-            border-bottom: none;        /* 移除底部邊框，達成無縫連接 */
+            border: 5px solid #444;
+            border-bottom: none;
             
             box-sizing: border-box;
             letter-spacing: 5px;
@@ -216,25 +208,22 @@
         
         #map {
             display: grid;
-            /* 使用 10 個等寬列，每列佔總寬度的 1fr */
             grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(10, 1fr);
             
-            /* 設定地圖的最大尺寸，vmin 代表寬高之中較小那個值的百分比 */
             width: 80vmin;
             height: 80vmin;
-            max-width: 800px; /* 限制最大不要超過原本的尺寸 */
+            max-width: 800px;
             max-height: 800px;
             margin-top: 0;
             gap: 2px;
             background-color: #333;
             border: 5px solid #444;
             border-radius: 0 0 5px 5px;
-            margin: 0 auto; /* 確保在容器中居中 */
+            margin: 0 auto;
         }
 
         .cell {
-            /* 移除固定的 65px，讓它自動填滿 grid 空間 */
             width: 100%;
             height: 100%;
             background-color: #fff;
@@ -243,7 +232,6 @@
             justify-content: center;
             align-items: center;
             
-            /* 讓字體大小也隨縮放稍微改變 */
             font-size: 1.5vmin;
             cursor: pointer;
             position: relative;
@@ -254,7 +242,6 @@
             box-shadow: inset 0 0 12px #ff4d4d !important;
             background-color: #ffe6e6 !important;
         }
-        /* 在灼燒格子內加入火焰小圖標 */
         .status-fire::after {
             content: "🔥";
             position: absolute;
@@ -263,12 +250,10 @@
             font-size: 14px;
         }
 
-        /* 冰寒狀態：邊框發藍光，並帶有冷色調 */
         .status-ice {
             box-shadow: inset 0 0 12px #00d4ff !important;
             background-color: #e6faff !important;
         }
-        /* 在冰寒格子內加入冰晶小圖標 */
         .status-ice::after {
             content: "❄️";
             position: absolute;
@@ -277,17 +262,14 @@
             font-size: 14px;
         }
 
-        /* 閃避狀態：整體變白色（高亮度），並有一種虛幻感 */
         .status-evade {
             background-color: #ffffff !important;
             filter: brightness(1.2) contrast(0.8);
             border: 1px solid #ddd;
         }
 
-        /* 側邊欄樣式 */
         #sidebar {
             width: 260px;
-            /* 這裡的高度要加上地圖的 border (10px) 和 gap 影響，約略等於地圖高度 */
             height: calc(80vmin + 55px);
             max-height: 845px;
             
@@ -305,10 +287,10 @@
         #sidebar::after {
             content: "";
             position: absolute;
-            bottom: 15px; /* 稍微往上一點，避開圓角邊框 */
+            bottom: 15px;
             left: 2px;
             right: 2px;
-            height: 30px; /* 增加漸層高度，暗示效果更明顯 */
+            height: 30px;
             background: linear-gradient(transparent, #fdfaf2);
             pointer-events: none;
             z-index: 10;
@@ -316,8 +298,8 @@
         }
         
         #side-info-container {
-            flex: 1;                /* 自動填滿剩餘高度 */
-            overflow-y: auto;       /* 超出高度時顯示捲軸 */
+            flex: 1;
+            overflow-y: auto;
             margin-top: 10px;
             padding-right: 5px;
             padding-bottom: 20px;
@@ -325,10 +307,8 @@
                 display: none;
             }
 
-            /* 隱藏捲軸 - 針對 Firefox */
             scrollbar-width: none;
 
-            /* 隱藏捲軸 - 針對 IE/Edge */
             -ms-overflow-style: none;
         }
         
@@ -341,17 +321,15 @@
             color: #333;
         }
         
-        /* 右側邊欄基礎樣式 */
         #sidebar-right {
             width: 260px;
             height: calc(80vmin + 55px);
             max-height: 845px;
             
-            background: #fdfaf2; /* 延續羊皮紙色 */
-            border: 2px solid #8b4513; /* 延續棕色邊框 */
+            background: #fdfaf2;
+            border: 2px solid #8b4513;
             border-radius: 10px;
             padding: 15px;
-            /* 陰影往左偏 (-3px)，產生對稱感 */
             box-shadow: -3px 3px 12px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
@@ -359,7 +337,6 @@
             position: relative;
         }
 
-        /* 頂部標題：勢力概況 */
         #right-side-title {
             margin: 0;
             font-size: 1.5em;
@@ -370,7 +347,6 @@
             font-weight: bold;
         }
 
-        /* 右側內容容器 (金幣、繁榮度、羈絆列表) */
         #right-info-container {
             flex: 1;
             overflow-y: auto;
@@ -378,7 +354,6 @@
             padding-right: 5px;
             padding-bottom: 20px;
             
-            /* 隱藏捲軸 */
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -387,7 +362,6 @@
             display: none;
         }
 
-        /* 數值區塊樣式 (金幣、繁榮度) */
         .global-stat-item {
             background: rgba(139, 69, 19, 0.05);
             margin-bottom: 10px;
@@ -396,14 +370,13 @@
             border: 1px dashed #8b4513;
         }
 
-        /* 羈絆列表專用樣式 */
         #bond-list-ui {
             margin-top: 15px;
         }
 
         .bond-item {
             background: #fff;
-            border-left: 4px solid #e74c3c; /* 羈絆用紅色線條強調 */
+            border-left: 4px solid #e74c3c;
             padding: 8px;
             margin-bottom: 8px;
             font-size: 13px;
@@ -412,7 +385,6 @@
 
         .option-btn { padding: 10px; margin: 5px; cursor: pointer; }
         
-        /* 血條與士氣條基礎樣式 */
         .bar-container { width: 85%; height: 4px; background: #eee; margin: 2px auto; border-radius: 2px; }
         .hp-bar { height: 100%; background: #ff4444; transition: width 0.3s; }
         .mp-bar { height: 100%; background: #4444ff; transition: width 0.3s; }
@@ -465,12 +437,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* 深黑透明背景 */
-            z-index: 999; /* 確保在最上層 */
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
             display: flex;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px); /* 背景模糊，增加質感 */
+            backdrop-filter: blur(5px);
         }
 
         .result-content {
@@ -516,16 +488,14 @@
         
         #fixed-game-guide {
             position: fixed;
-            bottom: 20px;       /* 距離螢幕底部 */
-            right: 20px;        /* 距離螢幕右側 */
-            z-index: 9999;      /* 確保在所有選單、地圖之上 */
-            
-            /* 樣式設計：古風紙捲感 */
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
             background: #fdfaf2;
             color: #8b4513;
             padding: 10px 15px;
             border: 2px solid #8b4513;
-            border-radius: 30px; /* 膠囊形狀 */
+            border-radius: 30px;
             text-decoration: none;
             font-weight: bold;
             font-size: 14px;
@@ -539,7 +509,7 @@
 
         #fixed-game-guide:hover {
             background: #eee5d8;
-            transform: translateY(-3px); /* 懸浮往上飄一點 */
+            transform: translateY(-3px);
             box-shadow: 2px 6px 15px rgba(0,0,0,0.4);
         }
 
