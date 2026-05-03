@@ -1103,9 +1103,14 @@ function checkNextDeploymentStep() {
     
     if (deploymentState.placedCount >= scenario.deployCount[scenario.factions.indexOf(factionName)]) {
             deploymentState.active = false;
-            currentScenario++;
-            if(currentScenario == 3) finishDeployment();
-            else updateSidebarForDeployment();
+            if(deploymentState.currentFaction == "東吳") finishDeployment();
+            else{
+                deploymentState.currentFaction = scenario.factions[scenario.factions.indexOf(factionName)+1];
+                deploymentState.active = true;
+                deploymentState.isKingPhase = true;
+                deploymentState.placedCount = 0;
+                updateSidebarForDeployment();
+            }
     } else {
         updateSidebarForDeployment();
     }
