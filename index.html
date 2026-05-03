@@ -936,12 +936,6 @@ function pickScenario(scenarioName) {
     overlay.style.display = 'none';
     menu.style.display = 'none';
     
-    socket.emit('match_request', { username: userId });
-}
-
-socket.on('match_success', (data) => {
-    roomId = data.room_id;
-    user_faction = data.room_faction[userId]
     deploymentState.active = true;
     deploymentState.currentFaction = scenarios[currentScenario].factions[user_faction];
     deploymentState.isKingPhase = true;
@@ -954,7 +948,9 @@ socket.on('match_success', (data) => {
     })
     
     updateSidebarForDeployment();
-});
+}
+
+
 
 function updateSidebarForDeployment() {
     const faction = deploymentState.currentFaction;
