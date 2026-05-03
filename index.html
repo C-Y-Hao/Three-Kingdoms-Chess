@@ -626,7 +626,940 @@
     <a href="https://c-y-hao.github.io/Three-Kingdoms-Chess-guide/" target="_blank" id="fixed-game-guide">
         <span class="guide-icon">📜</span> 遊戲指南
     </a>
-    <script src="https://forms.gle/aXiBFWzEA36DudFn6"></script>
-    <script src="TKC_Frontend.js"></script>
+    <script>
+        const mapContainer = document.getElementById('map');
+const menu = document.getElementById('menu');
+const overlay = document.getElementById('overlay');
+const optionsDiv = document.getElementById('options');
+const menuTitle = document.getElementById('menu-title');
+
+
+let selectedHeroes = [];
+let gameData = { wei: [], shu: [], wu: [], yuan: [], dong: [], yellow: [], han: [] };
+
+let roomId = 0;
+let act_id = 0;
+const NGROK_URL = 'https://lichenological-crissy-varicellate.ngrok-free.dev'
+
+
+const kings = {
+    '\u66f9\u9b4f': [
+        {id: 1000, name: '\u66f9\u64cd', attack: 75, defense: 85, skillName: '\u541b\u81e8\u5929\u4e0b', skillDesc: '\u6e1b\u5c11\u5168\u9ad4\u6575\u65b910\u9ede\u58eb\u6c23'},
+        {id: 1100, name: '\u66f9\u4e15', attack: 55, defense: 70, skillName: '\u5bd2\u4ee4\u5929\u4e0b', skillDesc: '\u7504\u5b93\u7684[\u51b0\u5bd2]\u63a7\u5834\u6548\u679c\u5ef6\u9577\u4e00\u56de\u5408'},
+        
+    ],
+    '\u8700\u6f22': [
+        {id: 2000, name: '\u5289\u5099', attack: 72, defense: 82, skillName: '\u4ec1\u5fb7\u6cbb\u4e16', skillDesc: '\u5c07\u5468\u570d\u6575\u65b9\u5c07\u981830%\u5175\u529b\u8f49\u70ba\u81ea\u8eab\u5175\u529b'},
+        //{id: 2100, name: '\u5289\u79aa', attack: 20, defense: 45, skillName: '\u8a17\u5b64\u4e4b\u4efb', skillDesc: '\u5c0d\u96a8\u6a5f\u4e00\u540d\u6211\u65b9\u5c07\u9818\u5be6\u65bd[\u653e\u6b0a]\uff0c\u8f49\u79fb\u81ea\u8eab\u5175\u529b200\u7d66[\u653e\u6b0a]\u5c0d\u8c61\uff0c[\u653e\u6b0a]\u5c0d\u8c61\u5982\u679c\u662f\u6b66\u5c07\u5247\u6b66\u529b\u6c38\u4e45\u63d0\u9ad810%\uff0c\u5982\u679c\u662f\u8b00\u58eb\u5247\u76ee\u524d\u6280\u80fd\u51b7\u537b-1\uff0c[\u653e\u6b0a]\u5c0d\u8c61\u662f\u8af8\u845b\u4eae\u6216\u59dc\u7dad\u6642\u6548\u679c\u52a0\u500d'},
+    ],
+    '\u6771\u5433': [
+        {id: 3000, name: '\u5b6b\u6b0a', attack: 68, defense: 80, skillName: '\u5236\u8861\u8853', skillDesc: '\u5e73\u5206\u5433\u570b\u5168\u9ad4\u5175\u529b\uff0c\u4e26\u70ba\u5433\u570b\u5168\u9ad4\u589e\u52a015\u9ede\u58eb\u6c23'},
+        {id: 3100, name: '\u5b6b\u7b56', attack: 98, defense: 77, skillName: '\u9738\u738b\u70c8\u7130', skillDesc: '[\u4e3b\u52d5]\u7372\u5f97\u4e00\u5c64[\u75be\u98a8]\u72c0\u614b\n[\u88ab\u52d5]\u81ea\u8eab\u7372\u5f97[\u9738\u9ad4]\uff0c\u514d\u75ab\u6240\u6709\u8ca0\u9762\u72c0\u614b\u3002\u653b\u64ca\u7684\u5c0d\u8c61\u7acb\u5373\u7d50\u7b97\u76ee\u524d\u53d7\u5230\u7684[\u707c\u71d2]\u50b7\u5bb3\uff0c\u4e26\u518d\u9644\u52a0\u4e00\u5c64[\u707c\u71d2]'},
+    ],
+    '\u8a0e\u8463\u806f\u8ecd': [
+        {id: 4000, name: '\u8881\u7d39', attack: 55 , skillName: '', skillDesc: ''},
+    ],
+    '\u8463\u5353\u9663\u71df': [
+        {id: 5000, name: '\u8463\u5353', attack: 55 , skillName: '', skillDesc: ''},
+    ],
+    '\u9ec3\u5dfe': [
+        {id: 6000, name: '\u5f35\u89d2', attack: 55 , skillName: '', skillDesc: ''},
+    ],
+    '\u6f22\u5ba4': [
+        {id: 7000, name: '\u6f22\u9748\u5e1d', attack: 55 , skillName: '', skillDesc: ''},
+    ],
+};
+
+const database = {
+    
+    '_':[
+         {id: 0, name: '\u672a\u77e5', attack: 0, defense: 0, skillName: '_', skillDesc: '_'}
+         ],
+    
+    '\u66f9\u9b4f': [
+        {id: 1001, name: '\u590f\u4faf\u60c7', attack: 92, defense: 82, skillName: '\u62d4\u77e2\u5556\u775b', skillDesc: '\u653b\u64ca\u6216\u53d7\u5230\u653b\u64ca\u6642\uff0c\u7372\u5f971\u5c64[\u6230\u610f]\uff0c\u53ef\u7121\u4e0a\u9650\u758a\u52a0\uff0c\u4e3b\u52d5\u91cb\u653e\u6280\u80fd\u6642\u5c0d\u4e5d\u5bae\u683c\u5167\u6575\u8ecd\u9020\u6210\u50b7\u5bb3\uff0c\u50b7\u5bb3\u91cf\u70ba[\u6230\u610f]\u5c64\u6578X5%X\u590f\u4faf\u60c7\u7576\u6642\u5175\u529b\uff0c\u540c\u6642\u6e05\u7a7a[\u6230\u610f]\u5c64\u6578\u3002'},
+        {id: 1002, name: '\u590f\u4faf\u6df5', attack: 91, defense: 78, skillName: '\u75be\u884c\u5f37\u653b', skillDesc: '\u6211\u65b9\u5168\u9ad4\u55ae\u4f4d\u7372\u5f97[\u75be\u98a8]\u72c0\u614b\uff0c\u6301\u7e8c1\u56de\u5408\uff0c\u53ef\u984d\u5916\u79fb\u52d5\u4e00\u6b21\u3002'},
+        {id: 1003, name: '\u5f35\u907c', attack: 96, defense: 90, skillName: '\u5a01\u9707\u900d\u9059\u6d25', skillDesc: '\u81ea\u8eab\u6b66\u529b\u63d0\u534730%\u6301\u7e8c\u4e00\u56de\u5408\u3001\u589e\u52a0\u81ea\u8eab10\u9ede\u58eb\u6c23'},
+        {id: 1004, name: '\u8a31\u891a', attack: 98, defense: 93, skillName: '\u864e\u7661\u8b77\u4e3b', skillDesc: '\u9032\u5165[\u864e\u7661\u30fb\u8a31\u891a]\u578b\u614b\uff0c\u81ea\u8eab\u53d7\u5230\u50b7\u5bb3-50%\u6301\u7e8c\u5169\u56de\u5408\uff0c\u4e26\u70ba\u66f9\u64cd\u9644\u52a0\u4e00\u5c64[\u9435\u58c1]\u6548\u679c'},
+        {id: 1005, name: '\u66f9\u4ec1', attack: 70, defense: 98, skillName: '\u516b\u9580\u91d1\u9396\u9663', skillDesc: '\u4ee5\u66f9\u4ec1\u70ba\u4e2d\u5fc3\u5c55\u958b5X5\u7bc4\u570d\u9663\u6cd5\uff0c\u7bc4\u570d\u5167\u6240\u6709\u9b4f\u570b\u55ae\u4f4d\u7372\u5f97[\u9435\u58c1]\u72c0\u614b\u3002\u53d7\u5230\u7bad\u77e2\u653b\u64ca\u6642\uff0c[\u9435\u58c1]\u53ef\u514d\u50b7\u4e00\u6b21\uff0c\u53d7\u5230\u50b7\u5bb3\u6642\uff0c\u8a72\u50b7\u5bb3\u6e1b\u534a\uff0c[\u9435\u58c1]\u6548\u679c\u7d50\u675f\u3002\u82e5\u540c\u6642\u53d7\u5230[\u707c\u71d2]\u6548\u679c\uff0c\u5247\u96d9\u65b9\u6548\u679c\u4e92\u76f8\u62b5\u92b7\uff0c\u4e0d\u518d\u89f8\u767c\u6e1b\u50b7\u3002'},
+        {id: 1006, name: '\u5178\u97cb', attack: 95, defense: 95, skillName: '\u53e4\u4e4b\u60e1\u4f86', skillDesc: '\u9032\u5165[\u60e1\u4f86\u30fb\u5178\u97cb]\u578b\u614b\u6301\u7e8c\u5169\u56de\u5408\uff0c\u66f9\u64cd\u6240\u53d7\u50b7\u5bb3\u7531\u5178\u97cb\u627f\u64d4\uff0c\u5178\u97cb\u627f\u53d7\u7684\u50b7\u5bb3\u6e1b\u5c1150%\uff0c\u627f\u53d7\u8f49\u79fb\u50b7\u5bb3\u6642\uff0c\u5178\u97cb\u5c0d\u653b\u64ca\u8005\u53cd\u64ca\uff0c\u9020\u621030%\u66f9\u64cd\u539f\u672c\u6240\u53d7\u50b7\u5bb3\u3002'},
+        {id: 1007, name: '\u90ed\u5609', attack: 18, defense: 35, skillName: '\u9b3c\u624d\u4e00\u7b56', skillDesc: '\u9b4f\u570b\u96a8\u6a5f\u4e09\u96bb\u5c07\u9818\u6280\u80fd\u51b7\u537b\u6b78\u96f6\uff0c\u81ea\u8eab\u5175\u529b-33%'},
+        {id: 1009, name: '\u8340\u5f67', attack: 12, defense: 42, skillName: '\u738b\u4f50\u4e4b\u624d', skillDesc: '\u9b4f\u570b\u5168\u9ad4\u5175\u529b+15%\u3001\u6280\u80fd\u51b7\u537b-1'},
+        {id: 1010, name: '\u7504\u5b93', attack: 8, defense: 20, skillName: '\u6d1b\u6c34\u51dd\u5bd2', skillDesc: '\u4ee5\u7504\u5b93\u70ba\u4e2d\u5fc35\u00d75\u7bc4\u570d\u5167\u6240\u6709\u55ae\u4f4d\u7372\u5f97[\u51b0\u5bd2]\u72c0\u614b\u3002\u9b4f\u570b\u55ae\u4f4d\u5728\u7372\u5f97[\u51b0\u5bd2]\u6642\uff0c\u7acb\u523b\u79fb\u9664\u81ea\u8eab2\u56de\u5408\u707c\u71d2\u6548\u679c\u3002\u975e\u9b4f\u570b\u55ae\u4f4d\u5728\u7372\u5f97[\u51b0\u5bd2]\u5f8c\uff0c\u4e0b\u4e00\u56de\u5408\u88ab\u5c07\u7121\u6cd5\u884c\u52d5'},
+        {id: 1011, name: '\u5f35\u90c3', attack: 90, defense: 71, skillName: '\u4e58\u865b\u800c\u5165', skillDesc: '\u79fb\u52d5\u5230\u6575\u65b9\u5175\u529b\u6700\u4f4e\u7684\u5c07\u9818\u5468\u570d\u7684\u683c\u5b50'},
+        {id: 1012, name: '\u4e8e\u7981', attack: 71, defense: 90, skillName: '\u8ecd\u6cd5\u5982\u5c71', skillDesc: '5x5\u7bc4\u570d\u5167\u6211\u65b9\u55ae\u4f4d\u9032\u5165[\u6574\u8ecd]\u72c0\u614b\uff0c\u6230\u9b25\u3001\u707c\u71d2\u4e2d\u53d7\u5230\u50b7\u5bb3\u964d\u4f4e30%\uff0c\u6301\u7e8c2\u56de\u5408\u3002'},
+        {id: 1013, name: '\u6a02\u9032', attack: 88, defense: 73, skillName: '\u5148\u767b\u7834\u9663', skillDesc: '\u653b\u64ca\u6575\u65b9\u5c07\u9818\u6642\u9644\u5e36\u64ca\u9000\u6548\u679c\uff1b\u82e5\u76ee\u6a19\u56e0\u5f8c\u65b9\u6709\u55ae\u4f4d\u800c\u7121\u6cd5\u88ab\u64ca\u9000\uff0c\u5247\u518d\u89f8\u767c\u4e00\u6b21\u653b\u64ca'},
+        {id: 1015, name: '\u8cc8\u8a61', attack: 33, defense: 21, skillName: '\u9023\u74b0\u6bd2\u9663', skillDesc: '\u9078\u64c7\u5834\u4e0a\u6b66\u529b\u6700\u9ad8\u7684\u6575\u65b9\u5c07\u9818\uff0c\u5c0d\u5176\u53ca\u5468\u570d5x5\u683c\u6575\u8ecd\u65bd\u52a0\u4e2d\u6bd2\u6548\u679c\uff0c\u6301\u7e8c2\u56de\u5408\u3002'}
+    ],
+    
+    '\u8700\u6f22': [
+        {id: 2001, name: '\u95dc\u7fbd', attack: 99, defense: 93, skillName: '\u7fa9\u8584\u96f2\u5929', skillDesc: '[\u88ab\u52d5]\u5c0d\u5175\u529b\u9ad8\u65bc\u81ea\u5df1\u7684\u55ae\u4f4d\u9020\u6210\u984d\u591660%\u50b7\u5bb3'},
+        {id: 2002, name: '\u5f35\u98db', attack: 94, defense: 88, skillName: '\u7576\u967d\u6012\u543c', skillDesc: '5X5\u7bc4\u570d\u6575\u8ecd\u7372\u5f97[\u5a01\u5687]1\u56de\u5408\uff0c\u6b66\u529b\u221250%\u3002'},
+        {id: 2003, name: '\u8d99\u96f2', attack: 97, defense: 92, skillName: '\u4e03\u9032\u4e03\u51fa', skillDesc: '\u8207\u5289\u5099\u4ea4\u63db\u4f4d\u7f6e\uff0c\u81ea\u8eab\u6230\u529b+30%\uff0c\u6301\u7e8c\u4e00\u56de\u5408'},
+        {id: 2004, name: '\u99ac\u8d85', attack: 96, defense: 83, skillName: '\u795e\u5a01\u5929\u964d', skillDesc: '\u9032\u5165[\u9326\u99ac\u8d85]\u578b\u614b\uff0c\u6b66\u529b+200%\uff0c\u884c\u52d5\u6b21\u6578+1\uff0c\u6301\u7e8c2\u56de\u5408\u3002'},
+        {id: 2005, name: '\u9ec3\u5fe0', attack: 82, defense: 82, skillName: '\u767e\u6b65\u7a7f\u694a', skillDesc: '\u96a8\u6a5f\u5c04\u64ca\u4e00\u96bb\u6575\u65b9\u5c07\u9818\u9020\u6210\u50b7\u5bb3500\u4e26\u9644\u52a0[\u7834\u7532]\u72c0\u614b\uff0c\u6b66\u529b\u578b\u5c07\u9818-5%\u6b66\u529b\u503c\uff0c\u667a\u529b\u578b\u5c07\u9818\u984d\u5916\u589e\u52a020%\u50b7\u5bb3'},
+        {id: 2006, name: '\u9b4f\u5ef6', attack: 80, defense: 80, skillName: '\u5b50\u5348\u5947\u8972', skillDesc: '\u79fb\u52d5\u5230\u9b4f\u570b\u51fa\u751f\u5730\u4e2d\u5fc3\u7684\u96a8\u6a5f\u7a7a\u683c\uff0c\u4e26\u5c0d\u8a72\u4f4d\u7f6e\u5468\u570d\u7684\u6575\u65b9\u55ae\u4f4d\u9020\u6210\u81ea\u8eab\u5175\u529b50%\u7684\u50b7\u5bb3\uff0c\u6280\u80fd\u6700\u591a\u4f7f\u7528\u4e00\u6b21\u3002'},
+        {id: 2007, name: '\u8af8\u845b\u4eae', attack: 20, defense: 45, skillName: '\u516b\u9663\u5b9a\u52e2', skillDesc: '[\u4e3b\u52d5]\u6700\u4f4e\u7684\u6575\u8ecd\u70ba\u4e2d\u5fc3\u76845x5\u65b9\u683c\u5167\u6240\u6709\u6575\u8ecd\u53d7\u5230\u8af8\u845b\u4eae\u81ea\u8eab\u5175\u529b\u768430%\u50b7\u5bb3\uff0c\u82e5\u6575\u8ecd\u8655\u65bc\u7570\u5e38\u72c0\u614b([\u707c\u71d2]/[\u51b0\u5bd2])\uff0c\u9020\u6210\u50b7\u5bb3\u52a0\u500d\n[\u88ab\u52d5]\u958b\u5834\u5f8c\u70ba\u5168\u8700\u570b\u5c07\u9818\u9644\u52a0[\u6771\u98a8]\u72c0\u614b\uff0c\u7b2c\u4e00\u6b21\u53d7\u5230\u7684[\u707c\u71d2]\u80fd\u53cd\u5f48\u7d66\u8ddd\u96e2\u6700\u8fd1\u7684\u6575\u8ecd'},
+        {id: 2008, name: '\u9f90\u7d71', attack: 18, defense: 40, skillName: '\u9cf3\u843d\u897f\u5ddd', skillDesc: '\u9663\u4ea1\u5f8c\u8700\u570b\u58eb\u6c23\u56de\u6eff'},
+        {id: 2009, name: '\u6cd5\u6b63', attack: 15, defense: 38, skillName: '\u775a\u7725\u5fc5\u5831', skillDesc: '\u4ee5\u6cd5\u6b63\u70ba\u4e2d\u5fc35\uff385\u7bc4\u570d\u5167\u6240\u6709\u8700\u570b\u5c07\u9818\u7372\u5f97[\u5fa9\u4ec7]\u72c0\u614b\uff0c\u8a18\u9304\u8a72\u55ae\u4f4d\u65bc\u672c\u56de\u5408\u5167\u6240\u53d7\u5230\u7684\u50b7\u5bb3\u7e3d\u91cf\u3002\u5728\u4e0b\u4e00\u56de\u5408\u9996\u6b21\u767c\u52d5\u653b\u64ca\u6642\uff0c\u5c07\u8a18\u9304\u7684\u50b7\u5bb3\u503c\u984d\u5916\u9644\u52a0\u65bc\u653b\u64ca\u76ee\u6a19\uff0c\u96a8\u5f8c\u79fb\u9664[\u5fa9\u4ec7]\u72c0\u614b'},
+        {id: 2010, name: '\u59dc\u7dad', attack: 88, defense: 82, skillName: '\u5f8c\u7e7c\u4e4b\u92d2', skillDesc: '\u81ea\u8eab\u6b66\u529b\u6c38\u4e45\u63d0\u53477%\uff0c\u5175\u529b+10%\uff0c\u6b66\u529b\u503c\u9ad8\u65bc135\u5f8c\u4e0d\u53ef\u4f7f\u7528\u6280\u80fd'},
+        {id: 2011, name: '\u9ec3\u6708\u82f1', attack: 10, defense: 35, skillName: '\u8af8\u845b\u9023\u5f29', skillDesc: '\u96a8\u6a5f\u5c0d10\u96bb\u6575\u65b9\u5c07\u9818\u9020\u6210300\u5175\u529b\u50b7\u5bb3'},
+        {id: 2012, name: '\u99ac\u826f', attack: 12, defense: 32, skillName: '\u767d\u7709\u5b89\u8ecd', skillDesc: '\u8700\u570b\u5168\u9ad4\u5175\u529b+10%\u3001\u6b66\u529b+5%\u3001\u58eb\u6c23+10'},
+        {id: 2013, name: '\u5ed6\u5316', attack: 70, defense: 78, skillName: '\u5b64\u8ecd\u596e\u6230', skillDesc: '[\u88ab\u52d5]\u8700\u570b\u5c07\u9818\u5269\u4e0b\u8b00\u58eb\u3001\u541b\u4e3b\u6642\uff0c\u5ed6\u5316\u6b66\u529b+60%\uff0c\u5175\u529b+1500'},
+        {id: 2014, name: '\u5b5f\u7372', attack: 78, defense: 77, skillName: '\u4e0d\u5c48\u883b\u738b', skillDesc: '\u9663\u4ea1\u5f8c\u5fa9\u6d3b\uff0c\u88dc\u5145500\u5175\u529b\u3001\u58eb\u6c23\u56de\u6eff\u3001\u6b66\u529b+10%\uff0c\u6700\u591a\u89f8\u767c\u5169\u6b21'},
+        {id: 2015, name: '\u795d\u878d', attack: 31, defense: 56, skillName: '\u706b\u7fbd\u98db\u5200', skillDesc: '\u5c0d\u8ddd\u96e2\u6700\u9060\u7684\u5169\u540d\u6575\u65b9\u5c07\u9818\u9020\u621010%\u81ea\u8eab\u5175\u529b\u50b7\u5bb3\uff0c\u4e26\u9644\u52a0[\u707c\u71d2]2\u56de\u5408'},
+        {id: 2016, name: '\u5140\u7a81\u9aa8', attack: 71, defense: 100, skillName: '\u85e4\u7532\u5929\u58c1', skillDesc: '\u7d66\u5169\u540d\u8ddd\u96e2\u6700\u8fd1\u7684\u53cb\u8ecd\u7a7f\u4e0a\u85e4\u7532\u4e09\u56de\u5408\uff0c\u7d66\u81ea\u5df1\u7a7f\u4e0a\u85e4\u7532\u5169\u56de\u5408\uff0c\u6230\u9b25\u4e2d\u53d7\u5230\u50b7\u5bb3-80%\uff0c\u9047\u5230\u707c\u71d2\u6548\u679c\u6642\u6703\u628a\u6575\u65b9\u7684\u706b\u64f4\u6563\u7d66\u76f8\u9130\u53cb\u8ecd'},
+        {id: 2017, name: '\u5289\u5df4', attack: 20, defense: 25, skillName: '\u76f4\u767e\u5bcc\u570b', skillDesc: '\u8700\u570b\u8ca1\u5bcc+50%\uff0c\u6240\u6709\u52e2\u529b\u88dc\u5145\u5175\u529b\u7684\u91d1\u5e63\u6d88\u8017+10%\u3002'},
+        //{id: 2025, name: '\u5f90\u5eb6', attack: 20, defense: 25, skillName: '\u5947\u7b56\u672a\u76e1', skillDesc: '\u6211\u65b9\u5168\u9ad4\u653b\u64ca\u9644\u5e36[\u7834\u7532]\uff0c\u6bcf\u6b21\u4f7f\u7528\u5f8c\u6280\u80fd\u51b7\u537b\u6642\u9593+1\u56de\u5408'}
+    ],
+    
+    '\u6771\u5433': [
+        {id: 3001, name: '\u9ec3\u84cb', attack: 72, defense: 88, skillName: '\u82e6\u8089\u8a08', skillDesc: '\u4ee5\u9ec3\u84cb\u70ba\u4e2d\u5fc33X3\u7bc4\u570d\u5167\u6575\u8ecd\uff0c\u5175\u529b-15%\u3001\u4e26\u9032\u5165\u707c\u71d2\u72c0\u614b(\u6bcf\u56de\u5408\u5175\u529b-10%)\u4e00\u56de\u5408'},
+        {id: 3002, name: '\u7518\u5be7', attack: 96, defense: 78, skillName: '\u9326\u5e06\u591c\u8972', skillDesc: '\u5c0d\u8840\u91cf\u6700\u9ad8\u7684\u6575\u570b\u541b\u4e3b\u9020\u6210\u81ea\u8eab\u5175\u529b30%\u7684\u50b7\u5bb3'},
+        {id: 3003, name: '\u592a\u53f2\u6148', attack: 95, defense: 85, skillName: '\u767e\u6b65\u6d41\u77e2', skillDesc: '\u5c0d\u96a8\u6a5f\u6575\u8ecd\u9020\u6210750\u50b7\u5bb3'},
+        {id: 3004, name: '\u5442\u8499', attack: 80, defense: 80, skillName: '\u767d\u8863\u6e21\u6c5f', skillDesc: '\u5433\u570b\u9032\u5165\u9583\u907f\u72c0\u614b\u4e00\u56de\u5408\uff0c\u6230\u9b25\u4e2d\u514d\u75ab\u50b7\u5bb3'},
+        {id: 3005, name: '\u9678\u905c', attack: 22, defense: 50, skillName: '\u706b\u71d2\u9023\u71df', skillDesc: '\u4ee5\u9678\u905c\u70ba\u4e2d\u5fc35X5\u7bc4\u570d\uff0c\u6575\u8ecd\u5175\u529b-15%\uff0c\u4e26\u9032\u5165\u707c\u71d2\u72c0\u614b\uff0c\u6bcf\u56de\u5408\u5175\u529b-10%\uff0c\u6301\u7e8c\u5169\u56de\u5408'},
+        {id: 3006, name: '\u5468\u6cf0', attack: 78, defense: 98, skillName: '\u6368\u8eab\u8b77\u4e3b', skillDesc: '\u70ba5X5\u7bc4\u570d\u5167\u53cb\u8ecd\u9644\u52a0[\u8840\u76fe]\uff0c\u6230\u9b25\u4e2d\u6240\u53d7\u50b7\u5bb3\u8f49\u79fb\u7d66\u5468\u6cf0\uff0c\u5468\u6cf0\u53d7\u5230\u7684\u8f49\u79fb\u50b7\u5bb3\u6e1b\u5c1150%'},
+        {id: 3007, name: '\u5468\u745c', attack: 60, defense: 55, skillName: '\u8d64\u58c1\u706b\u6d77', skillDesc: '\u4ee5\u5468\u745c\u70ba\u4e2d\u5fc37X7\u7bc4\u570d\u5167\u6575\u8ecd\u9032\u5165\u707c\u71d2\u72c0\u614b(\u6bcf\u56de\u5408\u5175\u529b-10%)\uff0c\u6301\u7e8c\u6642\u9593\u5206\u70ba\u4e09\u6bb5\uff0c\u6700\u5167\u5c64\u4e09\u56de\u5408\uff0c\u4e2d\u5c64\u5169\u56de\u5408\uff0c\u6700\u5916\u5c64\u4e00\u56de\u5408'},
+        {id: 3008, name: '\u9b6f\u8085', attack: 15, defense: 40, skillName: '\u4e09\u5206\u9060\u7565', skillDesc: '\u91cd\u7f6e\u96a8\u6a5f2\u540d\u6575\u65b9\u8b00\u58eb\u6280\u80fd\u51b7\u537b\u72c0\u614b'},
+        {id: 3009, name: '\u5927\u55ac', attack: 6, defense: 18, skillName: '\u570b\u8272\u5929\u9999', skillDesc: '[\u88ab\u52d5]\u5433\u570b\u5c07\u9818\u9663\u4ea1\u6642\u7acb\u5373\u5fa9\u6d3b\uff0c\u88dc\u5145500\u5175\u529b\u3001\u58eb\u6c23\u56de\u6eff\u3001\u6280\u80fd\u51b7\u537b\u6b78\u96f6\uff0c\u6700\u591a\u89f8\u767c\u5169\u6b21'},
+        {id: 3010, name: '\u5c0f\u55ac', attack: 7, defense: 17, skillName: '\u7d05\u984f\u70c8\u706b', skillDesc: '[\u88ab\u52d5]\u5433\u570b[\u707c\u71d2]\u50b7\u5bb3+100%'},
+        {id: 3011, name: '\u51cc\u7d71', attack: 90, defense: 80, skillName: '\u540c\u821f\u5171\u6230', skillDesc: '\u8207\u6b66\u529b\u503c\u6700\u9ad8\u7684\u5433\u570b\u5c07\u9818\u9032\u5165[\u540c\u821f]\u72c0\u614b\uff0c\u96d9\u65b9\u7372\u5f97\u6230\u529b\u52a0\u6210100%\uff0c\u5c0d\u6230\u4e2d\u82e5\u5176\u4e2d\u4e00\u65b9\u53d7\u5230\u50b7\u5bb3\uff0c\u50b7\u5bb3\u7531\u5175\u529b\u8f03\u9ad8\u7684\u4e00\u65b9\u627f\u53d7\u3002'},
+        {id: 3012, name: '\u8af8\u845b\u747e', attack: 12, defense: 35, skillName: '\u548c\u8877\u5171\u6fdf', skillDesc: '\u79fb\u9664\u5168\u9ad4\u53cb\u8ecd1\u500b\u8ca0\u9762\u72c0\u614b\uff0c\u82e5\u7121\u8ca0\u9762\u72c0\u614b\u5247+500\u5175\u529b'},
+        {id: 3016, name: '\u5f35\u662d', attack: 34, defense: 43, skillName: '\uff3f', skillDesc: '\u79fb\u9664\u5168\u9ad4\u53cb\u8ecd1\u500b\u8ca0\u9762\u72c0\u614b\uff0c\u82e5\u7121\u8ca0\u9762\u72c0\u614b\u5247+500\u5175\u529b'}
+    ],
+    '\u8a0e\u8463\u806f\u8ecd': [
+        {id: 4001, name: '\u8881\u8853', attack: 42, skillName: '', skillDesc: ''},
+        {id: 4002, name: '\u66f9\u64cd', attack: 53, skillName: '', skillDesc: ''},
+        {id: 4003, name: '\u5b6b\u5805', attack: 90, skillName: '\u7389\u74bd\u5929\u547d', skillDesc: '\u5168\u9ad4\u53cb\u8ecd\u58eb\u6c23+15\uff0c\u5b6b\u5805\u9032\u5165[\u5e1d\u6c23]\u72c0\u614b2\u56de\u5408\uff0c\u8655\u65bc[\u5e1d\u6c23]\u72c0\u614b\u6642\uff0c\u5b6b\u5805\u5468\u570d3\u00d73\u53cb\u8ecd\u58eb\u6c23\u984d\u5916+15'},
+        {id: 4004, name: '\u5289\u5099', attack: 57, skillName: '', skillDesc: ''},
+        {id: 4005, name: '\u516c\u5b6b\u74da', attack: 72, skillName: '', skillDesc: ''},
+        {id: 4006, name: '\u99ac\u9a30', attack: 84, skillName: '', skillDesc: ''},
+        {id: 4007, name: '\u95dc\u7fbd', attack: 96, skillName: '', skillDesc: ''},
+        {id: 4008, name: '\u5f35\u98db', attack: 92, skillName: '', skillDesc: ''},
+        {id: 4009, name: '\u590f\u4faf\u60c7', attack: 86, skillName: '', skillDesc: ''},
+        {id: 4010, name: '\u7a0b\u666e', attack: 79, skillName: '', skillDesc: ''},
+        {id: 4011, name: '\u9ec3\u84cb', attack: 76, skillName: '', skillDesc: ''},
+        {id: 4012, name: '\u984f\u826f\u30fb\u6587\u919c', attack: 88, skillName: '\u864e\u8c79\u96d9\u96c4', skillDesc: ''},
+    ],
+    '\u8463\u5353\u9663\u71df': [
+        {id: 5001, name: '\u5442\u5e03', attack: 143, skillName: '', skillDesc: ''},
+        {id: 5002, name: '\u674e\u5095', attack: 79, skillName: '', skillDesc: ''},
+        {id: 5003, name: '\u90ed\u6c5c', attack: 76, skillName: '', skillDesc: ''},
+        {id: 5004, name: '\u83ef\u96c4', attack: 88, skillName: '', skillDesc: ''},
+        {id: 5005, name: '\u8cc8\u8a61', attack: 32, skillName: '', skillDesc: ''},
+        {id: 5006, name: '\u8c82\u87ec', attack: 21, skillName: '', skillDesc: ''},
+        {id: 5007, name: '\u674e\u5112', attack: 22, skillName: '\u6bd2\u9152\u5f12\u541b', skillDesc: '[\u4e3b\u52d5]\u5168\u9ad4\u6575\u65b9\u58eb\u6c23-15\n[\u88ab\u52d5][\u4e2d\u6bd2]\u50b7\u5bb3+50%'},
+        {id: 5008, name: '\u9ad8\u9806', attack: 98, skillName: '', skillDesc: ''},
+    ],
+    '\u9ec3\u5dfe': [
+        {id: 6001, name: '\u5f35\u5bf6', attack: 72, skillName: '', skillDesc: ''},
+        {id: 6002, name: '\u5f35\u6881', attack: 86, skillName: '', skillDesc: ''},
+        {id: 6003, name: '\u6ce2\u624d', attack: 90, skillName: '', skillDesc: ''},
+        {id: 6004, name: '\u7ba1\u4ea5', attack: 35, skillName: '', skillDesc: ''},
+        {id: 6005, name: '\u7a0b\u9060\u5fd7', attack: 32, skillName: '', skillDesc: ''},
+        {id: 6006, name: '\u5ed6\u5316', attack: 84, skillName: '', skillDesc: ''},
+        {id: 6007, name: '\u5468\u5009', attack: 60, skillName: '', skillDesc: ''},
+    ],
+    '\u6f22\u5ba4': [
+        {id: 7001, name: '\u4f55\u9032', attack: 72, skillName: '', skillDesc: ''},
+        {id: 7002, name: '\u76e7\u690d', attack: 86, skillName: '', skillDesc: ''},
+        {id: 7003, name: '\u6731\u5101', attack: 90, skillName: '', skillDesc: ''},
+        {id: 7004, name: '\u7687\u752b\u5d69', attack: 35, skillName: '', skillDesc: ''},
+        {id: 7005, name: '\u66f9\u64cd', attack: 32, skillName: '', skillDesc: ''},
+        {id: 7006, name: '\u5b6b\u5805', attack: 84, skillName: '', skillDesc: ''},
+        {id: 7007, name: '\u5289\u5099', attack: 60, skillName: '', skillDesc: ''},
+        {id: 7008, name: '\u8463\u5353', attack: 42, skillName: '', skillDesc: ''},
+    ]
+};
+
+const city_map = {
+    0:'\u6d1b\u967d', 1:'\u9577\u5b89', 2:'\u6b66\u660c', 3:'\u8a31\u660c',
+    4:'\u6210\u90fd', 5:'\u5efa\u696d', 6:'\u5433\u90e1', 7:'\u4e0a\u5eb8',
+    8:'\u6f22\u4e2d', 9:'\u8944\u967d', 10:'\u5408\u80a5', 11:'\u58fd\u6625',
+    12:'\u6c5f\u9675',13:'\u846d\u840c\u95dc',14:'\u528d\u9580',15:'\u7dbf\u7af9',
+    16:'\u5927\u6563\u95dc',17:'\u6b66\u95dc',18:'\u6f7c\u95dc',19:'\u9678\u53e3',
+    20:'\u6fe1\u9808\u53e3',21:'\u5937\u9675',22:'\u767d\u5e1d\u57ce',23:'\u51fd\u8c37\u95dc',
+    24:'\u864e\u7262\u95dc',
+    [-1]:'\u7121'
+};
+
+const city_pos = [
+    {id: 0, pos: 15}, {id: 1, pos: 13}, {id: 2, pos: 86},
+    {id: 3, pos: 17}, {id: 4, pos: 70}, {id: 5, pos: 59},
+    {id: 6, pos: 88}, {id: 7, pos: 54}, {id: 8, pos: 42},
+    {id: 9, pos: 55}, {id: 10, pos: 47}, {id: 11, pos: 46},
+    {id: 12, pos: 65},{id: 13, pos: 51},{id: 14, pos: 61},
+    {id: 15, pos: 71},{id: 16, pos: 22},{id: 17, pos: 34},
+    {id: 18, pos: 14},{id: 19, pos: 67},{id: 20, pos: 58},
+    {id: 21, pos: 84},{id: 22, pos: 83},{id: 23, pos: 16},
+    {id: 24, pos: 25}
+];
+
+const bond_name ={
+    101:'\u9b4f\u6b66\u96c4\u5e2b', 102:'\u5b98\u6e21\u4e4b\u5a01', 103:'\u4e94\u5b50\u826f\u5c07', 104:'\u9285\u7246\u9435\u58c1',
+    105:'\u5e1d\u738b\u7121\u60c5', 106:'\u4e82\u4e16\u4e09\u6bd2', 107:'\u5bcc\u7532\u4e2d\u539f', 201:'\u6843\u5712\u7d50\u7fa9',
+    202:'\u4e94\u864e\u4e0a\u5c07', 203:'\u5317\u4f10\u5b64\u81e3', 204:'\u5b9a\u8ecd\u5947\u529f', 205:'\u5357\u7586\u6b78\u6f22',
+    206:'\u4e94\u7a40\u8c50\u767b', 301:'\u6c5f\u8868\u864e\u81e3', 302:'\u711a\u5929\u4e4b\u708e', 303:'\u6771\u5433\u96d9\u74a7',
+    304:'\u5bcc\u53ef\u6575\u570b', 901:'\u5b6b\u5289\u806f\u76df'
+};
+
+const deployZones = {
+    '\u66f9\u9b4f': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19, 20, 21, 23, 24, 26, 27, 28, 29],
+    '\u8700\u6f22': [50, 52, 60, 62, 72, 80, 81, 82, 90, 91, 92],
+    '\u6771\u5433': [48, 49, 66, 68, 69, 76, 77, 78, 79, 87, 89, 96, 97, 98, 99],
+    '\u8a0e\u8463\u806f\u8ecd': [3, 4, 5, 6, 30, 40, 50, 60, 39, 49, 59, 69, 93, 94, 95, 96],
+    '\u8463\u5353\u9663\u71df': [33, 34, 35, 36, 43, 44, 45, 46, 53, 54, 55, 56, 63, 64, 65, 66],
+    '\u9ec3\u5dfe': [29, 38, 39, 48, 49, 58, 59, 67, 68, 69, 74, 75, 76, 77, 78, 79, 83, 84, 85, 86, 87, 88, 89, 92, 93, 94, 95, 96, 97, 98, 99],
+    '\u6f22\u5ba4': [0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25, 30, 31, 32, 33, 34, 35, 40, 41, 42, 43, 50, 51, 52, 53]
+};
+
+
+const scenarios = {
+    '\u4e09\u5206\u5929\u4e0b': {
+        factions: ['\u66f9\u9b4f', '\u8700\u6f22', '\u6771\u5433'],
+        deployCount: [6, 6, 6]
+    },
+    /*'\u9ec3\u5dfe\u8d77\u7fa9': {
+        factions: ['\u9ec3\u5dfe', '\u6f22\u5ba4'],
+        deployCount: [7, 7]
+    },
+    '\u7fa4\u96c4\u8a0e\u8463': {
+        factions: ['\u8463\u5353\u9663\u71df', '\u8a0e\u8463\u806f\u8ecd'],
+        deployCount: [7, 9]
+    }*/
+};
+
+const C_to_E = {
+    '\u66f9\u9b4f': 'wei',
+    '\u8700\u6f22': 'shu',
+    '\u6771\u5433': 'wu',
+    '\u8a0e\u8463\u806f\u8ecd': 'yuan',
+    '\u8463\u5353\u9663\u71df': 'dong',
+    '\u9ec3\u5dfe': 'yellow',
+    '\u6f22\u5ba4': 'han'
+}
+
+let currentScenario = '\u4e09\u5206\u5929\u4e0b';
+let currentPhase = {
+    factionIndex: 0,
+    isKing: true,
+    count: 0
+};
+
+let deploymentState = {
+    active: false,
+    currentFaction: '',
+    isKingPhase: true,
+    placedCount: 0
+};
+
+function findHeroName(id) {
+    for (let country in kings) {
+        const found = kings[country].find(h => h.id === id);
+        if (found) return found.name;
+    }
+    for (let country in database) {
+        const found = database[country].find(h => h.id === id);
+        if (found) return found.name;
+    }
+    return "\u672a\u77e5\u6b66\u5c07";
+}
+
+function findHeroCountry(id) {
+    if(Math.floor(id / 1000) === 1)return '\u66f9\u9b4f';
+    if(Math.floor(id / 1000) === 2)return '\u8700\u6f22';
+    if(Math.floor(id / 1000) === 3)return '\u6771\u5433';
+    if(Math.floor(id / 1000) === 4)return '\u8a0e\u8463\u806f\u8ecd';
+    if(Math.floor(id / 1000) === 5)return '\u8463\u5353\u9663\u71df';
+    if(Math.floor(id / 1000) === 6)return '\u9ec3\u5dfe';
+    if(Math.floor(id / 1000) === 7)return '\u6f22\u5ba4';
+    return "\u672a\u77e5";
+}
+
+
+function gameControl(type) {
+    const mainOverlay = document.getElementById('main-overlay');
+    const recruitOverlay = document.getElementById('recruit-overlay');
+    if(type == "start"){
+        mainOverlay.style.display = 'none';
+        initMap();
+    }
+    else if(type == "recruit"){
+        recruitOverlay.style.display = 'flex';
+    }
+}
+
+function initMap() {
+    mapContainer.innerHTML = '';
+    for (let i = 0; i < 100; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = `cell-${i}`;
+        
+        cell.onclick = () => handleCellClick(i);
+        
+        mapContainer.appendChild(cell);
+    }
+    
+    showScenarioMenu();
+}
+
+function closeMenu() {
+    menu.style.display = 'none';
+    overlay.style.display = 'none';
+    optionsDiv.innerHTML = "";
+    
+    if(deploymentState.currentFaction === '') showScenarioMenu();
+}
+overlay.onclick = closeMenu;
+
+function showScenarioMenu() {
+    overlay.style.display = 'block';
+    menu.style.display = 'block';
+    menuTitle.innerText = "\u9078\u64c7\u904a\u6232\u5287\u672c";
+    optionsDiv.innerHTML = '';
+    
+    Object.keys(scenarios).forEach(name => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.style.padding = "10px";
+        btn.style.margin = "5px";
+        btn.innerText = name;
+        btn.onclick = () => pickScenario(name);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function pickScenario(scenarioName) {
+    currentScenario = scenarioName;
+    overlay.style.display = 'none';
+    menu.style.display = 'none';
+    
+    socket.emit('match_request', { username: userId });
+}
+
+socket.on('match_success', (data) => {
+    roomId = data.room_id;
+    user_faction = data.room_faction[userId]
+    deploymentState.active = true;
+    deploymentState.currentFaction = scenarios[currentScenario].factions[user_faction];
+    deploymentState.isKingPhase = true;
+    deploymentState.placedCount = 0;
+    selectedHeroes = [];
+    
+    city_pos.forEach(c => {
+        document.getElementById('cell-' + c.pos).innerText = city_map[c.id];
+        document.getElementById('cell-' + c.pos).style.backgroundColor = '#eeeeee';
+    })
+    
+    updateSidebarForDeployment();
+});
+
+function updateSidebarForDeployment() {
+    const faction = deploymentState.currentFaction;
+    const type = deploymentState.isKingPhase ? "\u541b\u4e3b" : "\u5c07\u9818";
+    document.getElementById('side-name').innerText = `\u90e8\u7f72\u4e2d\uff1a${faction}`;
+    document.getElementById('side-info').innerHTML = `
+        <p>\u8acb\u9ede\u64ca\u5730\u5716\u4e0a\u7684<b>\u6de1\u8272\u5340\u57df</b>\u4f86\u653e\u7f6e\u4f60\u7684<b style="color:red;">${type}</b>\u3002</p>
+    `;
+    
+    highlightDeployZones(faction);
+}
+
+function highlightDeployZones(faction) {
+    document.querySelectorAll('.cell').forEach(cell => {
+        if (cell.innerText.trim() === "") {
+            cell.style.backgroundColor = '';
+        }
+    });
+    deployZones[faction].forEach(index => {
+        const cell = document.getElementById(`cell-${index}`);
+        if (cell.dataset.occupied !== "true") {
+            cell.style.backgroundColor = getFactionColor(faction);
+        }
+    });
+}
+function handleCellClick(cellIndex) {
+    if (!deploymentState.active) return;
+    
+    const factionName = deploymentState.currentFaction;
+    const zone = deployZones[factionName];
+    
+    if (!zone.includes(cellIndex)) {
+        return;
+    }
+    
+    const existingUnit = document.getElementById(`cell-${cellIndex}`).innerText;
+    if (existingUnit !== "") {
+        return;
+    }
+    
+    showHeroSelectionMenu(cellIndex);
+}
+
+function showHeroSelectionMenu(cellIndex) {
+    const factionName = deploymentState.currentFaction;
+    overlay.style.display = 'block';
+    menu.style.display = 'block';
+    optionsDiv.innerHTML = '';
+    
+    if (deploymentState.isKingPhase) {
+        menuTitle.innerText = `\u8acb\u5728\u8a72\u4f4d\u7f6e\u653e\u7f6e\u3010${factionName}\u3011\u541b\u4e3b`;
+        
+        const king = kings[factionName] || [];
+        king.forEach(hero => {
+            if (hero.id % 1000 !== 0) return;
+            if (!selectedHeroes.includes(hero.id)) {
+                const btn = document.createElement('button');
+                
+                btn.innerText = `${hero.name}`;
+                
+                
+                btn.style.padding = "10px";
+                btn.style.margin = "5px";
+                btn.onclick = () => openHeroCard(hero, cellIndex, true);
+                optionsDiv.appendChild(btn);
+            }
+        });
+    } else {
+        const needed = scenarios[currentScenario].deployCount[scenarios[currentScenario].factions.indexOf(deploymentState.currentFaction)];
+        menuTitle.innerText = `\u8acb\u9078\u64c7\u8981\u653e\u7f6e\u7684\u5c07\u9818 (${deploymentState.placedCount}/${needed})`;
+        
+        const available = database[factionName] || [];
+        available.forEach(hero => {
+            if (!selectedHeroes.includes(hero.id)) {
+                const btn = document.createElement('button');
+                btn.innerText = `${hero.name}`;
+                btn.style.padding = "10px";
+                btn.style.margin = "5px";
+                btn.onclick = () => openHeroCard(hero, cellIndex, false);
+                optionsDiv.appendChild(btn);
+            }
+        });
+    }
+}
+
+
+
+function openHeroCard(hero, cellIndex, isKing) {
+    
+    currentPendingHeroId = hero.id; // \u66ab\u5b58 ID
+    
+    // \u586b\u5165\u8cc7\u6599
+    document.getElementById('card-hero-name').innerText = hero.name;
+    document.getElementById('card-faction').innerText = findHeroCountry(hero.id);
+    document.getElementById('card-attack').innerText = hero.attack;
+    document.getElementById('card-defense').innerText = hero.defense;
+    document.getElementById('card-skill-name').innerText = hero.skillName;
+    document.getElementById('card-skill-desc').innerText = hero.skillDesc;
+    
+    // \u986f\u793a\u5716\u5361
+    document.getElementById('hero-card-overlay').style.display = 'flex';
+    
+    // \u91cd\u65b0\u7d81\u5b9a\u78ba\u8a8d\u6309\u9215\u7684\u9ede\u64ca\u4e8b\u4ef6
+    document.getElementById('btn-confirm-select').onclick = function() {
+        closeHeroCard();
+        placeHeroOnMap(hero, cellIndex, isKing);
+    };
+}
+
+function closeHeroCard() {
+    document.getElementById('hero-card-overlay').style.display = 'none';
+}
+
+function placeHeroOnMap(hero, cellIndex, isKing) {
+    const targetCell = document.getElementById(`cell-${cellIndex}`);
+    const faction = deploymentState.currentFaction;
+    
+    targetCell.style.backgroundColor = getDarkFactionColor(faction);
+    targetCell.innerHTML = `
+    <div style="font-weight:bold; color:$#333">${hero.name}</div>
+    `;
+    
+    selectedHeroes.push(hero.id);
+    const record = {
+        id: hero.id,
+        name: hero.name,
+        attack: hero.attack,
+        defense: hero.defense,
+        x: Math.floor(cellIndex / 10),
+        y: cellIndex % 10
+    };
+    const key = C_to_E[deploymentState.currentFaction];
+    gameData[key].push(record);
+    targetCell.dataset.occupied = "true";
+    overlay.style.display = 'none';
+    menu.style.display = 'none';
+    
+    if (isKing) {
+        deploymentState.isKingPhase = false;
+    } else {
+        deploymentState.placedCount++;
+    }
+    
+    checkNextDeploymentStep();
+}
+
+function checkNextDeploymentStep() {
+    const scenario = scenarios[currentScenario];
+    const factionName = deploymentState.currentFaction;
+    
+    if (deploymentState.placedCount >= scenario.deployCount[scenario.factions.indexOf(factionName)]) {
+            deploymentState.active = false;
+            finishDeployment();
+    } else {
+        updateSidebarForDeployment();
+    }
+}
+
+
+
+
+
+function getFactionColor(faction) {
+    if (faction.includes('\u9b4f')) return '#f0f8ff';
+    if (faction.includes('\u8700')) return '#f5fff5';
+    if (faction.includes('\u5433')) return '#fbceca';
+    if (faction === '\u8463\u5353\u9663\u71df') return "#cfafed";
+    if (faction === '\u8a0e\u8463\u806f\u8ecd') return "#fff2cc";
+    if (faction === '\u9ec3\u5dfe') return "#fff2cc";
+    if (faction === '\u6f22\u5ba4') return "#fbceca";
+    
+    return '#eeeeee';
+}
+function getDarkFactionColor(faction) {
+    if (faction.includes('\u9b4f')) return '#ddeeff';
+    if (faction.includes('\u8700')) return '#eeffee';
+    if (faction.includes('\u5433')) return '#faada8';
+    if (faction === '\u8463\u5353\u9663\u71df') return "#9c49ea";
+    if (faction === '\u8a0e\u8463\u806f\u8ecd') return "#ffe599";
+    if (faction === '\u9ec3\u5dfe') return "#ffe599";
+    if (faction === '\u6f22\u5ba4') return "#faada8";
+    
+    return '#eeeeee';
+}
+
+function getDDarkFactionColor(faction){
+    if (faction.includes('\u9b4f')) return '#0055ff';
+    if (faction.includes('\u8700')) return '#00aa00';
+    if (faction.includes('\u5433')) return '#f44336';
+    if (faction === '\u8463\u5353\u9663\u71df') return "#6a329f";
+    if (faction === '\u8a0e\u8463\u806f\u8ecd') return "#ccaa00";
+    if (faction === '\u9ec3\u5dfe') return "#ccaa00";
+    if (faction === '\u6f22\u5ba4') return "#f44336";
+    
+    return '#5b5b5b';
+}
+
+
+
+function finishDeployment() {
+    
+    for (let i = 0; i < 100; i++) {
+        document.getElementById('cell-' + i).onclick = null;
+        document.getElementById('cell-' + i).style.cursor = "default";
+        if (document.getElementById('cell-' + i).innerText === "") document.getElementById('cell-' + i).style.backgroundColor = "#fff";
+    }
+    
+    overlay.style.display = 'none';
+    menu.style.display = 'none';
+    document.getElementById('side-name').innerText = "\u6230\u9b25\u958b\u59cb";
+    document.getElementById('side-info').innerHTML = "<b style='color:blue;'>\u90e8\u7f72\u5b8c\u6210\uff01\u6e96\u5099\u9032\u5165\u6230\u9b25\u3002</b>";
+    
+    console.log(gameData);
+    
+    fetch('http://127.0.0.1:5001/start_game', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gameData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('\u6210\u529f\uff1a', data);
+        if (data.world_state) {
+            document.getElementById('controls').style.display = 'block';
+            act_id = data.active_id;
+            updateCity(data.city);
+            updateMapDisplay(data.world_state, data.money, data.cost, data.act_bond);
+            
+        }
+    });
+    //.catch((error) => {
+    //console.error('\u5931\u6557\uff1a', error.message);
+    //});
+}
+
+let currentWorldState = [];
+
+function updateMapDisplay(units, money, cost, act_bond) {
+    currentWorldState = units;
+    const turnInfo = document.getElementById('turn-info');
+    if (act_id != 0) {
+        const activeName = findHeroName(act_id);
+        turnInfo.innerText = `\u8f2a\u5230\uff1a${activeName}`;
+        
+        turnInfo.style.color = getDDarkFactionColor(findHeroCountry(act_id));
+    }
+    
+    units.forEach(u => {
+        const cellIndex = u.y * 10 + u.x;
+        const cell = document.getElementById('cell-' + cellIndex);
+        cell.style.position = 'relative';
+        cell.style.cursor = 'pointer';
+        
+        let heroName = findHeroName(u.id);
+        if(u.tranf && u.id == 2004) heroName = '\u9326\u30fb\u99ac\u8d85';
+        if(u.tranf && u.id == 1004) heroName = '\u864e\u7661\u30fb\u8a31\u891a';
+        if(u.tranf && u.id == 1006) heroName = '\u60e1\u4f86\u30fb\u5178\u97cb';
+        
+        if (u.fire) cell.classList.add('status-fire');
+        if (u.ice) cell.classList.add('status-ice');
+        const armyPct = (u.army / 6000) * 100;
+        const moralePct = (u.morale / 100) * 100;
+        u.name = heroName;
+        if(u.id == act_id) showDetail(u, money, cost, act_bond);
+        
+        cell.innerHTML = `
+        <div style="font-size: 12px; font-weight: bold; text-align: center; margin-top: 5px;">${heroName}</div>
+        <div style="width: 80%; height: 4px; background: #eee; margin: 3px auto; border-radius: 2px;">
+            <div style="width: ${armyPct}%; height: 100%; background: #ff4444;"></div>
+        </div>
+        <div style="width: 80%; height: 4px; background: #eee; margin: 3px auto; border-radius: 2px;">
+            <div style="width: ${moralePct}%; height: 100%; background: #4444ff;"></div>
+        </div>
+        `;
+        
+
+        cell.onclick = () => {
+            u.name = heroName;
+            showDetail(u, money, cost, act_bond);
+        };
+        
+        
+        if(u.id == act_id) {
+            cell.style.backgroundColor = "#faf3c0";
+        }
+        else if(u.evade){
+            
+        }
+        else cell.style.backgroundColor = getFactionColor(findHeroCountry(u.id));
+    });
+}
+
+
+
+function showDetail(u, m, cost, act_bond) {
+    const sideName = document.getElementById('side-name');
+    const sideInfo = document.getElementById('side-info');
+    const skillInfo = document.getElementById('skill-info');
+    const skillName = document.getElementById('skill-name');
+    const skillDesc = document.getElementById('skill-desc');
+    const rightInfo = document.getElementById('right-info-container');
+    const factionData = m.find(im => im.id === Math.floor(u.id / 1000));
+    const money = factionData ? factionData.wealth : 0;
+    const score = factionData ? factionData.score : 0;
+    document.getElementById('stat-gold').textContent = money;
+    document.getElementById('stat-prosperity').textContent = score;
+    
+    const bonds = act_bond.filter(id => Math.floor(id / 100) === Math.floor(u.id / 1000) || (id === 901 && Math.floor(u.id / 1000) !== 1));
+    const names = bonds.map(id => bond_name[id] || `\u672a\u77e5\u7f88\u7d46(${id})`);
+    
+    document.getElementById('bond-content').textContent = names.join('\u3001');
+    
+    sideName.innerText = u.name;
+    sideName.style.color = getDDarkFactionColor(findHeroCountry(u.id));
+    
+    const effectConfigs = [
+        {key: 'evade', label: '\u9583\u907f', color: '#ff4d4d'},
+        {key: 'same_boat', label: '\u540c\u821f', color: '#ff4d4d'},
+        {key: 'fire', label: '\u707c\u71d2', color: '#ff4d4d'},
+        {key: 'turn', label: '\u8840\u76fe', color: '#ff4d4d'},
+        {key: 'wind', label: '\u75be\u98a8', color: '#007bff'},
+        {key: 'strengthen', label: '\u6574\u8ecd', color: '#007bff'},
+        {key: 'shield', label: '\u9435\u58c1', color: '#007bff'},
+        {key: 'ice', label: '\u51b0\u5bd2', color: '#007bff'},
+        {key: 'revenge', label: '\u5fa9\u4ec7', color: '#28a745'},
+        {key: 'fright', label: '\u5a01\u5687', color: '#28a745'},
+        {key: 'east_wind', label: '\u6771\u98a8', color: '#28a745'},
+        {key: 'vine', label: '\u85e4\u7532', color: '#28a745'},
+        {key: 'SA', label: '\u9738\u9ad4', color: '#ffd700'},
+        {key: 'poison', label: '\u4e2d\u6bd2', color: '#a689e1'},
+    ];
+    
+    let statusHtml = effectConfigs
+        .filter(eff => u[eff.key])
+        .map(eff => `
+             <span style="
+             background: ${eff.color};
+             color: white;
+             padding: 2px 8px;
+             border-radius: 4px;
+             font-size: 12px;
+             margin-right: 5px;
+             display: inline-block;
+             font-weight: bold;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+             ">
+             ${eff.label}
+             </span>
+             `).join('');
+    
+    if (statusHtml === '') {
+        statusHtml = '<span style="color: #999;">\u7121</span>';
+    }
+    
+    let cityDisplayHtml = "";
+    
+    if(city_map[u.at] == '\u7121'){
+        cityDisplayHtml = `<span style="color: #999;">\u7121</span>`;
+    }
+    else {
+        cityDisplayHtml =
+        `<span onclick="handleClickCity(${u.at})" style="
+        color: #007bff;
+        cursor: pointer;
+        font-weight: bold;
+        ">
+        ${city_map[u.at]}
+        </span>`;
+    }
+    
+    const isMyTurn = (u.id === act_id);
+    const isAtCity = (u.at !== -1);
+    const isLowArmy = (u.army <= 5000);
+    const moneyEnough = (money >= cost);
+    const canRefill = isAtCity && isLowArmy && moneyEnough;
+    
+    sideInfo.innerHTML = `
+    <div style="background: #fff; padding: 10px; border-radius: 5px; border-left: 5px solid #666;">
+    <div style="margin-bottom: 4px;"><b>\u653b\u64ca\uff1a</b> ${u.attack}</div>
+    <div style="margin-bottom: 4px;"><b>\u9632\u79a6\uff1a</b> ${u.defense}</div>
+    <div style="margin-bottom: 4px;"><b>\u5175\u529b\uff1a</b> <span style="color:red; font-weight:bold;">${u.army}</span>
+    ${isMyTurn && canRefill ? `
+        <button onclick="handleRefill(${u.id},${money},${cost})" style="
+        padding: 2px 8px;
+        background-color: #8b4513;
+        color: white;
+        border: 1px solid #5d2e0a;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        " onmouseover="this.style.backgroundColor='#a0522d'"
+        onmouseout="this.style.backgroundColor='#8b4513'">
+        \u88dc\u5175
+        </button>
+        ` : ''}
+    </div>
+    <div style="margin-bottom: 4px;"><b>\u58eb\u6c23\uff1a</b> <span style="color:blue; font-weight:bold;">${u.morale}</span></div>
+    <div style="margin-bottom: 4px;"><b>\u7576\u524d\u6548\u679c\uff1a</b> ${statusHtml}</div>
+    <div style="margin-bottom: 4px;"><b>\u6240\u5728\u57ce\u5e02\uff1a</b> ${cityDisplayHtml}</div>
+    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
+    <b>\u6280\u80fd\u72c0\u614b\uff1a</b>
+    ${
+        u.tar !== 0 ? '<span style="color:gray;">\u4e0d\u53ef\u7528</span>'
+        : (u.cd > 0
+           ? `<span style="color:orange;">\u51b7\u537b\u4e2d (${u.cd} \u56de\u5408)</span>`
+           : (u.id === act_id ? `<button onclick="sendAction('skill')"
+              style="
+              background:#ffd700;
+              border:none;
+              padding:5px 12px;
+              border-radius:6px;
+              cursor:pointer;
+              font-weight:bold;
+              transition:0.2s;
+              "
+              onmouseover="this.style.background='#ffcc00'"
+              onmouseout="this.style.background='#ffd700'"
+              >
+              \u4f7f\u7528\u6280\u80fd
+              </button>`
+              : '<span style="color:green;">\u6e96\u5099\u5c31\u7dd2</span>')
+           )
+    }
+    </div>
+    </div>
+    `;
+    
+    const heroFullData = findHeroDataById(u.id);
+    if (heroFullData) {
+        skillInfo.style.display = 'block';
+        skillName.style.display = 'inline';
+        skillDesc.style.display = 'inline';
+        skillName.innerText = heroFullData.skillName || "\u666e\u901a\u653b\u64ca";
+        skillDesc.innerText = heroFullData.skillDesc || "\u66ab\u7121\u8a73\u7d30\u63cf\u8ff0";
+    }
+}
+
+function handleRefill(heroId, money, cost){
+    overlay.style.display = 'block';
+    menu.style.display = 'block';
+    menuTitle.innerText = `\u78ba\u5b9a\u82b1\u8cbb${cost}\u5143\u70ba${findHeroName(heroId)}\u88dc\u51451000\u5175\u529b\u55ce\uff1f`;
+    optionsDiv.innerHTML = '';
+    const confirmBtn = document.createElement('button');
+    confirmBtn.innerText = "\u57f7\u884c\u88dc\u5175";
+    confirmBtn.className = "menu-option"; // \u5ef6\u7528\u4f60\u4e4b\u524d\u7684 CSS class
+    confirmBtn.onclick = () => {
+        // \u9019\u88e1\u57f7\u884c\u5be6\u969b\u7684\u88dc\u5175\u52d5\u4f5c\uff08\u767c\u9001\u6307\u4ee4\u7d66 C++\uff09
+        sendAction('refill');
+        
+        // \u57f7\u884c\u5b8c\u5f8c\u95dc\u9589\u9078\u55ae
+        closeMenu();
+    };
+    // \u5efa\u7acb\u300c\u53d6\u6d88\u300d\u6309\u9215
+    const cancelBtn = document.createElement('button');
+    cancelBtn.innerText = "\u53d6\u6d88";
+    cancelBtn.className = "menu-option";
+    cancelBtn.style.backgroundColor = "#999"; // \u8b93\u53d6\u6d88\u6309\u9215\u984f\u8272\u6de1\u4e00\u9ede
+    cancelBtn.onclick = () => {
+        closeMenu();
+    };
+    optionsDiv.appendChild(confirmBtn);
+    optionsDiv.appendChild(cancelBtn);
+}
+
+function handleClickCity(cityId) {
+    const cityData = allCities.find(c => c.id === cityId);
+    
+    if (cityData) {
+        showCity(cityData);
+    } else {
+        showCity({ id: cityId, economy: '\u672a\u77e5', score: '\u672a\u77e5', faction: -1 });
+    }
+}
+function findHeroDataById(id) {
+    for (let country in kings) {
+        const found = kings[country].find(h => h.id === id);
+        if (found) return found;
+    }
+    for (let country in database) {
+        const found = database[country].find(h => h.id === id);
+        if (found) return found;
+    }
+    return null;
+}
+let allCities = [];
+
+function sendAction(direction) {
+    fetch('http://127.0.0.1:5001/move_hero', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id: act_id,
+            dir: direction
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.king == 1){
+            const kingofkill = data.kingofkill || [];
+            let stats = [];
+            stats.push(`\u7e3d\u5171\u4ea4\u6230\uff1a${data.fightnum}\u6b21`);
+            kingofkill.forEach(king_kill => {
+                stats.push(`\u9996\u529f\uff1a${findHeroName(king_kill)}(\u64ca\u6bba\u6578${data.kingkillnum})`);
+            });
+            showGameResult(data.kingid, data.turn, stats);
+        }
+        console.log(data);
+        act_id = data.active_id;
+        updateRound(data);
+        allCities = data.city;
+        updateCity(data.city);
+        updateMapDisplay(data.world_state, data.money, data.cost, data.act_bond);
+    });//.catch((error) => {
+    //console.error('\u5931\u6557\uff1a', error.message);
+    //});
+}
+
+
+
+function showCity(c){
+    const sideName = document.getElementById('side-name');
+    const sideInfo = document.getElementById('side-info');
+    const skillInfo = document.getElementById('skill-info');
+    const skillName = document.getElementById('skill-name');
+    const skillDesc = document.getElementById('skill-desc');
+    
+    sideName.innerText = city_map[c.id];
+    sideName.style.color = getDDarkFactionColor(findHeroCountry(c.id));
+    
+    sideInfo.innerHTML = `
+    <div style="background: #fff; padding: 10px; border-radius: 5px; border-left: 5px solid #666;">
+    <div style="margin-bottom: 4px;"><b>\u7d93\u6fdf\uff1a</b> ${c.economy}</div>
+    <div style="margin-bottom: 4px;"><b>\u5206\u6578\uff1a</b> ${c.score}</div>
+    <div style="margin-bottom: 4px;"><b>\u52e2\u529b\uff1a</b> <span style="color:${getDDarkFactionColor(findHeroCountry(c.faction * 1000))}; font-weight:bold;">${findHeroCountry(c.faction * 1000)}</span></div>
+    </div>
+    </div>
+    `;
+    skillInfo.style.display = 'none';
+    skillName.style.display = 'none';
+    skillDesc.style.display = 'none';
+}
+
+function updateCity(city){
+    for (let i = 0; i < 100; i++) {
+        const cell = document.getElementById('cell-' + i);
+        cell.innerHTML = "";
+        cell.style.backgroundColor = "#fff";
+        cell.className = 'cell';
+        cell.style.filter = "";
+        cell.onclick = null;
+    }
+    city.forEach(c => {
+        const cellIndex = c.y * 10 + c.x;
+        const cell = document.getElementById('cell-' + cellIndex);
+        cell.style.position = 'relative';
+        cell.style.cursor = 'pointer';
+        
+        let cityName = city_map[c.id];
+        
+        c.name = cityName;
+        
+        cell.style.backgroundColor = getDarkFactionColor(findHeroCountry(c.faction * 1000));
+        
+        cell.innerHTML = `
+        <div style="font-size: 12px; font-weight: bold; text-align: center; margin-top: 5px;">${cityName}</div>
+        `;
+        cell.onclick = () => showCity(c);
+    });
+}
+
+function updateRound(data){
+    const round = data.turn;
+    const roundElem = document.getElementById('round-number');
+    const warningElem = document.getElementById('warning-msg');
+    const mapElem = document.getElementById('map');
+    
+    roundElem.innerText = round;
+    if (round >= 45) {
+        warningElem.style.display = "block";
+        warningElem.innerText = `\u26a0\ufe0f \u5269\u9918 ${50 - round} \u56de\u5408`;
+        
+        mapElem.classList.add('map-warning-shake');
+    } else {
+        warningElem.style.display = "none";
+        mapElem.classList.remove('map-warning-shake');
+    }
+}
+
+function showGameResult(kingid, roundCount, stats = []) {
+    const winner = findHeroCountry(kingid);
+    const screen = document.getElementById('result-screen');
+    document.getElementById('winner-name').innerText = `${winner} \u7d71\u4e00\u5929\u4e0b`;
+    document.getElementById('final-round').innerText = roundCount;
+    
+
+    const statsList = document.getElementById('stats-list');
+    statsList.innerHTML = stats.map(s => `<p>${s}</p>`).join('');
+    
+    screen.style.display = 'flex';
+}
+
+initMap();
+    </script>
 </body>
 </html>
