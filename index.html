@@ -937,7 +937,7 @@ function pickScenario(scenarioName) {
     menu.style.display = 'none';
     
     deploymentState.active = true;
-    deploymentState.currentFaction = scenarios[currentScenario].factions[user_faction];
+    deploymentState.currentFaction = scenarios[currentScenario].factions[0];
     deploymentState.isKingPhase = true;
     deploymentState.placedCount = 0;
     selectedHeroes = [];
