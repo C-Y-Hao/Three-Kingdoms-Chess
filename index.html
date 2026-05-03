@@ -550,89 +550,20 @@
 </head>
 <body>
     <h1 id="game-title">Three Kingdoms Chess</h1>
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <h2 id="form-title"></h2>
-            
-            <div class="input-group">
-                <label>帳號</label>
-                <input type="text" id="username" placeholder="輸入帳號...">
-            </div>
-            
-            <div class="input-group">
-                <label>密碼</label>
-                <input type="password" id="password" placeholder="輸入密碼...">
-            </div>
-
-            <div class="button-cluster">
-                <button class="auth-button btn-login" onclick="authAction('login')">登入</button>
-                <button class="auth-button btn-reg" onclick="authAction('register')">註冊</button>
-            </div>
-
-            <p id="auth-status"></p>
-        </div>
-    </div>
     
-    <div id="main-overlay" >
-        <div class="menu-card">
-            <h1 class="menu-title">選單</h1>
-                
-            <div class="menu-grid">
-                <button class="menu-btn primary" onclick="gameControl('start')">
-                    <span class="icon">⚔️</span> 進入遊戲
-                </button>
-                    
-                <button class="menu-btn" onclick="gameControl('recruit')">
-                    <span class="icon">📜</span> 招募
-                </button>
-                    
-                <button class="menu-btn" onclick="gameControl('my_heroes')">
-                    <span class="icon">👥</span> 查看將領
-                </button>
-                    
-                <button class="menu-btn" onclick="gameControl('rank')">
-                    <span class="icon">🏆</span> 排行榜
-                </button>
-                
-                <button class="menu-btn danger" onclick="gameControl('logout')">
-                    <span class="icon">🚪</span> 登出　　
-                </button>
-            </div>
-                
-            <div id="user-info-bar">
-                名稱：<span id="display-username">---</span> |
-                金錢：<span id="display-wealth">0</span>
-            </div>
-        </div>
-    </div>
-    
-    <div id="recruit-overlay">
-        <div class="recruit-card">
-            <h2 class="menu-title">招募</h2>
-            <div id="recruit-result" class="recruit-display">
-            </div>
-            
-            <div class="menu-grid">
-                <button class="menu-btn primary" onclick="Recruit(1)">招募一次</button>
-                <button class="menu-btn primary" onclick="Recruit(10)">招募十次</button>
-                <button class="menu-btn" onclick="closeRecruit()">返回</button>
-            </div>
-        </div>
-    </div>
-
     <div class="main-container">
         <div id="sidebar-right">
             <h2 id="right-side-title">勢力概況</h2>
             <div id="right-info-container">
                 <div class="global-stat-item">
-                    💰 財富值：<span id="stat-gold" style="color: #d4af37; font-weight: bold;">0</span>
+                    財富值：<span id="stat-gold" style="color: #d4af37; font-weight: bold;">0</span>
                 </div>
                 <div class="global-stat-item">
-                    📈 繁榮度：<span id="stat-prosperity" style="color: #27ae60; font-weight: bold;">0</span>
+                    繁榮度：<span id="stat-prosperity" style="color: #27ae60; font-weight: bold;">0</span>
                 </div>
 
                 <div id="bond-list-ui">
-                    <p style="margin: 5px 0; font-weight: bold; color: #8b4513;">🔗 當前羈絆：</p>
+                    <p style="margin: 5px 0; font-weight: bold; color: #8b4513;">當前羈絆：</p>
                     <div id="bond-content">
                         <span style="color: #999;">尚未達成任何羈絆</span>
                     </div>
